@@ -1,5 +1,4 @@
-# Chrome Lonely T-Rex Game NES Port
-A Nintendo Entertainment System port of the chrome t-rex game 
+# NES Port for the Chrome Lonely T-Rex Game 
 
 ![](doc/capture.gif)
 
