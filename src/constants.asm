@@ -1,0 +1,118 @@
+; CPU memory map
+; variables should be reset on reset
+MEM_LAYOUT_VAR_1 = $0000
+; variables should be perserve on reset
+MEM_LAYOUT_VAR_2= $0100
+MEM_LAYOUT_SPR = $0200
+MEM_LAYOUT_PRG = $C000
+MEM_LAYOUT_INT = $FFFA
+MEM_LAYOUT_CHR_MAIN = $0000
+MEM_LAYOUT_CHR_FONT = $0810
+
+
+; PPU memory map
+; https://wiki.nesdev.com/w/index.php/PPU_memory_map
+NAMETABLE_0 = $2000
+ATTRIBUTE_0 = $23C0
+NAMETABLE_1 = $2400
+ATTRIBUTE_1 = $27C0
+PAL_RAM_IDX = $3F00
+
+
+; http://www.vbforums.com/showthread.php?858389-NES-6502-Programming-Tutorial-Part-1-Getting-Started
+; https://wiki.nesdev.com/w/index.php/PPU_registers
+PPU_CTRL = $2000
+PPU_MASK = $2001
+PPU_STATUS = $2002
+PPU_OAM_ADDR = $2003
+PPU_SCROLL = $2005
+PPU_ADDR = $2006
+PPU_DATA = $2007
+PPU_OAM_DMA = $4014
+
+
+NES_CONTROLLER_0 = $4016
+
+
+; [7:NMI-off/on]
+; [6:PPU-master/slave]
+; [5:SPIRTE_SIZE-8*8/8*16]
+; [4:BG_CHR_ADDRESS-$0000/$1000]
+; [3:SPRITE_CHR_ADDRESS-$0000/$1000]
+; [2:VRAM_ADDRESS_SHIFT-+1/+32]
+; [1-0:0=$2000, 1=$2400, 2=$2800, 3=$2C00]
+INIT_PPU_CTRL = %10000000
+
+
+; [7:EM_BLUE-off/on]
+; [6:EM_GREEN-off/on]
+; [5:EM_RED-off/on]
+; [4:SHOW_SPRITES-hide/show]
+; [3:SHOW_BACKGROUND-hide/show]
+; [2:SHOW_SPRITES_IN_LEFTMOST_8_PIXELS-hide/show]
+; [1:SHOW_BACKGROUND_IN_LEFTMOST_8_PIXELS-hide/show]
+; [0:GREYSCALE-off/on]
+INIT_PPU_MASK = %00011110
+
+
+NES_TILE_SIZE = $08
+
+; GAME
+
+; count(spirte0 + dino + cloud) * $04
+SPRITE_0_SIZE = $04
+SPRITE_DINO_SIZE = $1C
+SPRITE_TOTAL_SIZE = SPRITE_0_SIZE + SPRITE_DINO_SIZE
+
+SPRITE_DINO = MEM_LAYOUT_SPR + SPRITE_0_SIZE
+
+; dino position of the screen
+GRD_POS_X = $08
+GRD_POS_Y = $85
+
+; game variables
+GAME_STATUS_INITIAL = $00
+; jump and drop on the ground
+GAME_STATUS_TRANSITION_1 = $01
+; dropped on the ground, drawing horizon line
+GAME_STATUS_TRANSITION_2 = $02
+GAME_STATUS_RUN = $03
+GAME_STATUS_OVER = $04
+
+TRANSITION_COLUMN_OFFSET = $63
+
+INITIAL_RANDOM_SEED = $55
+INITIAL_OBSTACLE_SPACING = $06
+; $19 = 26 = (single_screen_columns - dino_column_pos)
+OBSTACLE_COLLISION_DISTANCE = $19
+
+
+; dino tile offset to the chr
+DINO_TILE_HEAD_COMMON_1 = $01
+DINO_TILE_HEAD_COMMON_2 = $02
+DINO_TILE_BODY_COMMON_1 = $09
+DINO_TILE_BODY_COMMON_2 = $04
+DINO_TILE_BODY_COMMON_3 = $05
+DINO_TILE_FOOT_COMMON_1 = $06
+DINO_TILE_FOOT_COMMON_2 = $07
+
+DINO_TILE_FOOT_RIGHT_UP_1 = $0B
+DINO_TILE_FOOT_RIGHT_UP_2 = $0C
+
+DINO_TILE_FOOT_LEFT_UP_1 = $06
+DINO_TILE_FOOT_LEFT_UP_2 = $0A
+
+; dino foot offset to the sprite
+DINO_TILE_OFFSET_FOOT_1 = $15
+DINO_TILE_OFFSET_FOOT_2 = $19
+
+
+; dino status
+DINO_STATUS_STAND = $00
+DINO_STATUS_JUMPING = $01
+DINO_STATUS_DROPPING = $02
+
+DINO_INIT_WALK_SPEED = $02
+DINO_INIT_ANIMATION_SPEED = $0C
+DINO_INIT_JUMP_VELOCITY = $22
+DINO_DROP_STEP = $02

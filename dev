@@ -1,0 +1,151 @@
+#!/usr/bin/env bash
+
+# bash in shebang is required to use the sleep 0.5 command
+# intall following tools first
+# brew install nestopia-ue
+# brew install fswatch
+
+RED='\033[31m'
+GREEN='\033[32m'
+GRAY='\033[90m'
+cd src
+
+# extension name is not included
+# entry file which will be compiled to the nes file
+mfile=${1:-"chrome-dino"}
+
+noEmu=0
+if [[ $1 == "--no-emu" ]]; then
+  echo "Mode: Build only."
+  noEmu=1
+else
+  echo "Mode: Hot load."
+fi
+
+mfile="chrome-dino"
+asmfile=$mfile.asm
+nesfile=$mfile.nes
+fnsfile=$mfile.fns
+nlfile=$nesfile.0.nl
+
+
+# force kill flag
+fkill=0
+
+trap ctrl_c INT
+function ctrl_c() {
+  fkill=1
+}
+
+fns2nl() {
+  echo -e "Creating ${nlfile}..."
+  firstLineFlag=1
+
+  while IFS= read -r line
+  do
+    if [[ $line == \;* ]]; then
+      continue
+    fi
+
+    a=`echo ${line%=*}`
+    b=`echo ${line##*=}`
+
+    if [[ $firstLineFlag == 0 ]]; then
+      echo "$b#$a#" >> $nlfile
+    else
+      # clear the output
+      echo "$b#$a#" > $nlfile
+      firstLineFlag=0
+    fi
+
+  done < $fnsfile
+  echo -e "${GREEN}Success!$(tput sgr0)\n"
+}
+
+fwpid=0;
+lnpid=0;
+buildfail=0
+
+while true;
+  do
+    # reduce the cpu usage
+    sleep 0.5
+
+    if [[ $fkill == 1 ]]; then
+      if [[ $lnpid != 0 ]]; then
+        kill $lnpid
+      fi
+      if [[ $fwpid != 0 ]]; then
+        kill $fwpid
+      fi
+      break
+    fi
+
+    if ps -p $fwpid > /dev/null; then
+      # watching file is not change
+      if ! ps -p $lnpid > /dev/null; then
+        if [[ $buildfail == 0 && noEmu == 0 ]]; then
+          # emulator is exited, exit the script
+          echo "Exit the dev script due to the emulator is terminated by user."
+          exit 2;
+        fi
+      fi
+      continue;
+    fi
+
+    # stop the emulator for restart
+    if [[ $lnpid != 0 ]]; then
+      kill $lnpid
+      lnpid=0
+    fi
+
+    echo -e "\nCompiling ${nesfile}..."
+
+    # build source
+    ret=$(../nesasm-mac/nesasm $asmfile)
+    lret=$(echo "$ret" | tail -n1)
+
+    if [[ $lret != "pass 2" ]]; then
+      # compile failed
+      buildfail=1
+
+      echo -e "${RED}$ret $(tput sgr0)"
+
+      echo -e "Build failed! Waiting for the next change...\n"
+      # compile failed
+      echo -ne '\007'
+      sleep 0.5
+      echo -ne '\007'
+      sleep 0.5
+      echo -ne '\007'
+    else
+      echo -e "${GREEN}Success!$(tput sgr0)"
+
+      # generate nl file for debugger
+      fns2nl
+
+      # compile succeed, reset fail status
+      buildfail=0
+
+
+      if [[ $noEmu == 0 ]]; then
+        # emu is enabled
+        echo "Source code is changed, recompile and restart the emulator..."
+
+        # restart the emulator
+        nestopia -s 2 $nesfile &
+
+        # store the emulator pid
+        lnpid=$!
+      fi
+    fi
+
+    echo "$(date '+%Y-%m-%d %H:%M:%S')"
+    echo -e "${GRAY}============================$(tput sgr0)\n\n"
+
+    # start a new watcher
+    (fswatch --event Updated -1 *.asm */*.asm && echo "above file has been changed.") &
+
+    # store the fswatch pid
+    fwpid=$!
+  done

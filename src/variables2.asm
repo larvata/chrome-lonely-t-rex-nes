@@ -1,0 +1,10 @@
+; variables wont be reset by reset
+
+VAR_GAME_STATUS .rs 1
+VAR_DINO_STATUS .rs 1
+
+VAR_RANDOM_SEED .rs 1
+VAR_DINO_VELOCITY .rs 1
+VAR_DINO_VELOCITY_SLOW .rs 1
+
+VAR_SCORE_HI .rs 5
