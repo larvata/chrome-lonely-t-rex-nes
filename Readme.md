@@ -2,10 +2,16 @@
 
 ![](doc/capture.gif)
 
+## Prerequisite
+
+- nesasm
+- nestopia (OPTIONAL)
+
 ## Compile
 
 ```
-nesasm src/chrome-dino.asm
+cd src
+nesasm chrome-dino.asm
 ```
 
 ## Development
