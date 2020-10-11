@@ -27,11 +27,26 @@ SCORE_ADD_END:
 
 
 SCORE_COPY_TO_HIGH:
-  LDX #$00
+  ; check should replace the high socore
+  LDX #$04
 .Loop
+  LDA VAR_SCORE, x
+  CMP VAR_SCORE_HI, x
+  BCC SCORE_COPY_TO_HIGH_END
+  DEX
+  CPX #$FF
+  BNE .Loop
+
+
+SCORE_COPY_TO_HIGH_BEGIN
+  ; copy current score to high score
+  LDX #$00
+.Loop2
   LDA VAR_SCORE, x
   STA VAR_SCORE_HI, x
   INX
   CPX #$05
-  BNE .Loop
+  BNE .Loop2
+
+SCORE_COPY_TO_HIGH_END:
   RTS
