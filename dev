@@ -102,7 +102,7 @@ while true;
     echo -e "\nCompiling ${nesfile}..."
 
     # build source
-    ret=$(../nesasm-mac/nesasm $asmfile)
+    ret=$(nesasm $asmfile)
     lret=$(echo "$ret" | tail -n1)
 
     if [[ $lret != "pass 2" ]]; then

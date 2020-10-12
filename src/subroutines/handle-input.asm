@@ -8,33 +8,8 @@ INPUT_READ_A:
   ; Player 1 - A
   LDA NES_CONTROLLER_0
   AND #%00000001
+  STA VAR_LAST_A_0
   BEQ HANDLE_INPUT_END
-
-  ; tODO temporary disabled for scrolling fix
-  ; starting
-  ; ; TODO extract logic and handle text <press button a to start>
-  ; LDA VAR_GAME_STATUS
-  ; CMP #$01
-  ; BEQ HI_GAMEPLAY
-  ; LDA #$01
-  ; STA VAR_GAME_STATUS
-
-; perserve
-INPUT_READ_OTHERS:
-  ; Player 1 - B
-  LDA NES_CONTROLLER_0
-  ; Player 1 - Select
-  LDA NES_CONTROLLER_0
-  ; Player 1 - Start
-  LDA NES_CONTROLLER_0
-  ; Player 1 - Up
-  LDA NES_CONTROLLER_0
-  ; Player 1 - Down
-  LDA NES_CONTROLLER_0
-  ; Player 1 - Left
-  LDA NES_CONTROLLER_0
-  ; Player 1 - Right
-  LDA NES_CONTROLLER_0
 
 
 INPUT_HANDLE_GAMEPLAY:
